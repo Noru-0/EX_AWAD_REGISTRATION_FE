@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import ClientQueryProvider from '../components/query-client-provider'
+import { AnalyticsWrapper } from '../components/analytics-wrapper'
 
 // Import debug utility to suppress console logs
 import '../lib/debug'
@@ -38,13 +38,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'development';
-  
   return (
     <html lang="en">
       <body className={`${geist.className} antialiased`}>
         <ClientQueryProvider>{children}</ClientQueryProvider>
-        {!isDevelopment && <Analytics />}
+        <AnalyticsWrapper />
       </body>
     </html>
   )
