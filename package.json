@@ -4,9 +4,15 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "node config/setup.js development && next dev",
+    "dev:local": "node config/setup.js local && next dev",
+    "dev:prod": "node config/setup.js production && next dev",
+    "build:prod": "node config/setup.js production && next build",
+    "start": "next start",
     "lint": "eslint .",
-    "start": "next start"
+    "config:list": "node -e \"console.log('Available configs:', require('./config/config-manager').listAvailableConfigs())\"",
+    "config:setup": "node config/setup.js",
+    "config:validate": "node -e \"require('./config/config-manager').validateConfig()\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

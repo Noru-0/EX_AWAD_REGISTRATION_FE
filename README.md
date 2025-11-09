@@ -1,84 +1,137 @@
-# Frontend (my-v0-project)
+# Frontend Service
 
-Next.js frontend for the authentication demo.
+A modern Next.js frontend for user authentication with organized environment management and clean UI components.
 
-This app is built with Next.js and standard React components. It expects a backend API to handle registration, login and session verification.
+## 🚀 Quick Start
 
-## Prerequisites
-- Node.js (LTS recommended)
-- pnpm recommended (this repo includes a `pnpm-lock.yaml`), but npm/yarn will also work
+### Development (Default)
+```bash
+npm run dev
+# Runs on: http://localhost:3000
+# API calls to: http://localhost:4000
+```
 
-## Install
-From the `frontend/` directory:
+### Local with Backend Database
+```bash
+npm run dev:local
+# Runs on: http://localhost:3000
+# API calls to: http://localhost:4000 (with database)
+```
 
-Using pnpm:
+### Production Testing
+```bash
+npm run dev:prod
+# Runs on: http://localhost:3000
+# API calls to: https://ex-awad-registration-be.onrender.com
+```
 
-    pnpm install
+## ⚙️ Environment Management
 
-Or using npm:
+### Organized Configuration
+```
+frontend/
+├── config/
+│   ├── config-manager.js      # Smart config loader
+│   └── environments/          # All env files
+│       ├── .env.development   # Dev settings
+│       ├── .env.local        # Local DB settings
+│       └── .env.production   # Production settings
+└── .env.local                # Active config (auto-generated)
+```
 
-    npm install
+### Easy Setup
+```bash
+# Windows
+.\setup.bat          # Development
+.\setup.bat local    # Local with DB
+.\setup.bat prod     # Production
 
-If you see errors about peer deps during installs in this project use --legacy-peer-deps
+# NPM Scripts
+npm run config:list      # Show available configs
+npm run config:validate  # Validate current config
+```
 
-    npm install --legacy-peer-deps
+## 🎨 Features
 
-## Available scripts
-- `npm run dev` / `pnpm dev` — start Next.js in development mode
-- `npm run build` / `pnpm build` — build for production
-- `npm start` / `pnpm start` — start the production server after building
-- `npm run lint` — run ESLint
+### Authentication Pages
+- **Login Page**: Clean login form with carousel showcase
+- **Register Page**: User registration with validation
+- **Home Page**: Protected dashboard for authenticated users
 
-These are defined in `package.json` and map to the standard Next.js scripts.
+### UI Components
+- Modern glassmorphism design
+- Responsive layout with Tailwind CSS
+- Form validation with React Hook Form
+- Toast notifications with Sonner
+- Loading states and error handling
 
-## Environment variables
-Create a `.env.local` in `frontend/` for local development. Common variables you may need:
+### Environment Integration
+- Automatic API URL configuration
+- Environment-specific features
+- Debug mode for development
+- Production optimizations
 
-- `NEXT_PUBLIC_API_URL` — URL of the backend API (e.g. `http://localhost:4000`). Use this from client code to call the backend.
+## 🔧 Tech Stack
 
-Example `.env.local`:
+- **Framework**: Next.js 16.0.0 with React 19
+- **Styling**: Tailwind CSS with custom components
+- **Forms**: React Hook Form with validation
+- **HTTP**: Fetch API with credentials
+- **State**: TanStack React Query
+- **Icons**: Lucide React
+- **Toast**: Sonner notifications
 
-    NEXT_PUBLIC_API_URL=http://localhost:4000
+## 🌍 Environment Configuration
 
-Note: Do NOT commit `.env.local` to the repository.
+| Environment | API URL | Features | Purpose |
+|-------------|---------|----------|---------|
+| **Development** | `localhost:4000` | Debug enabled, Mock auth | Local development |
+| **Local** | `localhost:4000` | Debug enabled, Real DB | Local testing with database |
+| **Production** | `render.com` | Optimized, Analytics ready | Production deployment |
 
-## Development
-Start the frontend in development mode:
+## 🔐 Authentication Flow
 
-    npm run dev
+1. **Login Form**: User enters email/password
+2. **API Request**: POST to `/api/login` with credentials
+3. **Cookie Storage**: JWT token stored in HTTP-only cookie
+4. **Redirect**: Automatic redirect to `/home` on success
+5. **Protected Routes**: Middleware checks authentication
+6. **User Verification**: `/api/me` call on protected pages
 
-Open your browser at http://localhost:3000 (Next's default). If your backend runs on a different port (e.g. 4000), make sure the backend's `FRONTEND_ORIGIN` or CORS settings allow `http://localhost:3000`.
+## 📱 Pages & Routing
 
-## Build & Run (production)
-Build the app:
+- `/` - Login/Register page (public)
+- `/home` - User dashboard (protected)
+- `/register` - Alternative registration route
 
-    npm run build
+Protected routes automatically redirect to login if unauthenticated.
 
-Start the production server:
+## 🚢 Deployment
 
-    npm start
+### Render.com
+The frontend is configured for Render deployment with `render.yaml`. Set these environment variables:
+- `NEXT_PUBLIC_API_URL` - Backend API URL
+- `NODE_ENV=production`
 
-## Deployment
-This Next.js app can be deployed to Vercel, Netlify (with adapter), or any Node.js host that can run `next start`.
+### Build Commands
+```bash
+npm run build:prod    # Production build with env setup
+npm start            # Start production server
+```
 
-## Notes
-- If you change the API URL, rebuild or restart the dev server to pick up changes in some cases.
-- For secure cookies to work in production, ensure your backend and frontend use HTTPS and correct cookie settings.
+## 🔨 Development
 
-## License
-Add license information here if applicable.
+### Installation
+```bash
+npm install
+# or
+pnpm install
+```
 
-## Deploy to Render
+### Available Scripts
+- `npm run dev` - Development server with auto env setup
+- `npm run build` - Production build
+- `npm run start` - Production server
+- `npm run lint` - ESLint validation
 
-You can deploy the frontend as a Node (Next.js) web service on Render. The repository includes a `render.yaml` that declares the `ex-frontend` and `ex-backend` services.
-
-Steps:
-
-1. Push your repo (with `render.yaml` at the root) to GitHub and open the Render dashboard.
-2. Connect your repository and allow Render to create the resources from `render.yaml` or create services manually.
-3. Configure environment variables for the frontend service:
-    - `NEXT_PUBLIC_API_URL` — set to your backend URL (for example `https://ex-backend.onrender.com`).
-
-Notes:
-- If you use the service names in `render.yaml` (`ex-frontend`/`ex-backend`), Render will expose them at `https://ex-frontend.onrender.com` and `https://ex-backend.onrender.com` (assuming the names are available). Update `NEXT_PUBLIC_API_URL` accordingly.
-- For better security, keep cookies secure by using HTTPS in production and configuring CORS on the backend.
+The environment system automatically configures API URLs and features based on the selected environment.
