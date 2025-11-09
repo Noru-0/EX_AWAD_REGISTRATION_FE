@@ -4,6 +4,20 @@ A modern Next.js frontend for user authentication with organized environment man
 
 ## 🚀 Quick Start
 
+### Installation
+```bash
+# Install dependencies (use --legacy-peer-deps to bypass peer dependency conflicts)
+npm install --legacy-peer-deps
+```
+
+### Available Scripts
+- `npm run dev` - Development server with auto env setup
+- `npm run build` - Production build
+- `npm run start` - Production server
+- `npm run lint` - ESLint validation
+
+The environment system automatically configures API URLs and features based on the selected environment.
+
 ### Development (Default)
 ```bash
 npm run dev
@@ -118,20 +132,3 @@ The frontend is configured for Render deployment with `render.yaml`. Set these e
 npm run build:prod    # Production build with env setup
 npm start            # Start production server
 ```
-
-## 🔨 Development
-
-### Installation
-```bash
-npm install
-# or
-pnpm install
-```
-
-### Available Scripts
-- `npm run dev` - Development server with auto env setup
-- `npm run build` - Production build
-- `npm run start` - Production server
-- `npm run lint` - ESLint validation
-
-The environment system automatically configures API URLs and features based on the selected environment.

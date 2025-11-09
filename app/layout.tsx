@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google'
 import './globals.css'
 import ClientQueryProvider from '../components/query-client-provider'
 import { AnalyticsWrapper } from '../components/analytics-wrapper'
+import { Toaster } from '@/components/ui/toaster'
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className={`${geist.className} antialiased`}>
         <ClientQueryProvider>{children}</ClientQueryProvider>
         <AnalyticsWrapper />
+        <Toaster />
       </body>
     </html>
   )
