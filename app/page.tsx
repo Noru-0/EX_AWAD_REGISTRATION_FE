@@ -45,7 +45,7 @@ export default function Home() {
                 <Link href="/register">
                   <Button 
                     variant="outline" 
-                    className="w-full border-white/30 text-white hover:bg-white/10"
+                    className="w-full border-white/30 text-black hover:bg-white/10"
                     size="lg"
                   >
                     Create New Account
