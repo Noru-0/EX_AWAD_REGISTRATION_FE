@@ -14,36 +14,25 @@ export default function HomePage() {
       try {
         setIsLoading(true);
         
-        console.log('Checking authentication at:', `${API_BASE}/api/me`);
-        console.log('Current cookies:', document.cookie);
-        
         // Cookie-based token will be sent automatically when credentials: 'include' is set
         const res = await fetch(`${API_BASE}/api/me`, {
           credentials: 'include',
         })
 
-        console.log('Auth check response status:', res.status);
-        console.log('Auth check response headers:', Object.fromEntries(res.headers.entries()));
-
         if (!res.ok) {
-          console.log('Auth check failed, redirecting to login');
           router.push('/')
           return
         }
 
         const data = await res.json().catch(() => ({}))
-        console.log('Auth check response data:', data);
         
         if (data && data.user) {
-          console.log('User authenticated:', data.user);
           setUser(data.user);
           setIsLoading(false);
         } else {
-          console.log('No user data in response, redirecting to login');
           router.push('/');
         }
       } catch (e) {
-        console.error('Auth check error:', e);
         router.push('/')
       }
     }

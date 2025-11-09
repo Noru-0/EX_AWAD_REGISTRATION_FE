@@ -26,9 +26,6 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
   const router = useRouter()
   const mutation = useMutation({
     mutationFn: async (vals: FormValues) => {
-      console.log('Attempting login to:', `${API_BASE}/api/login`);
-      console.log('Login data:', vals);
-      
       const res = await fetch(`${API_BASE}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,39 +33,19 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
         body: JSON.stringify(vals),
       })
 
-      console.log('Login response status:', res.status);
-      console.log('Login response headers:', Object.fromEntries(res.headers.entries()));
-
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         const msg = err && (err.error || (err.errors && err.errors.join(', '))) ? (err.error || err.errors.join(', ')) : `Request failed: ${res.status}`
         throw new Error(msg)
       }
 
-      const result = await res.json();
-      console.log('Login response data:', result);
-      return result;
+      return res.json();
     },
-    onSuccess: async (data) => {
-      console.log('Login response:', data);
+    onSuccess: (data) => {
       if (data && data.ok) {
-        console.log('Login successful, redirecting to /home...');
-        // Small delay to ensure cookie is set before navigation
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        try {
-          router.push('/home');
-        } catch (e) {
-          console.error('Router push failed, using window.location:', e);
-          window.location.href = '/home';
-        }
-      } else {
-        console.error('Login response missing ok field:', data);
+        router.push('/home');
       }
     },
-    onError: (error) => {
-      console.error('Login mutation error:', error);
-    }
   })
   
   const handleLogin = async (e?: React.FormEvent) => {
