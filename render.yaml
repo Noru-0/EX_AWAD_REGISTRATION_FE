@@ -1,0 +1,23 @@
+# Render manifest for frontend service (frontend/render.yaml)
+# This file declares a single web service for the Next.js frontend.
+
+spec_version: 1
+
+services:
+  - type: web
+    name: ex-frontend
+    env: node
+    region: oregon
+    branch: master
+    plan: free
+    autoDeploy: true
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: NEXT_PUBLIC_API_URL
+        value: https://ex-awad-registration-be.onrender.com
+    # If you prefer, set NEXT_PUBLIC_API_URL in the Render dashboard instead of committing it here.

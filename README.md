@@ -19,6 +19,10 @@ Or using npm:
 
     npm install
 
+If you see errors about peer deps during installs in this project use --legacy-peer-deps
+
+    npm install --legacy-peer-deps
+
 ## Available scripts
 - `npm run dev` / `pnpm dev` — start Next.js in development mode
 - `npm run build` / `pnpm build` — build for production
@@ -63,3 +67,18 @@ This Next.js app can be deployed to Vercel, Netlify (with adapter), or any Node.
 
 ## License
 Add license information here if applicable.
+
+## Deploy to Render
+
+You can deploy the frontend as a Node (Next.js) web service on Render. The repository includes a `render.yaml` that declares the `ex-frontend` and `ex-backend` services.
+
+Steps:
+
+1. Push your repo (with `render.yaml` at the root) to GitHub and open the Render dashboard.
+2. Connect your repository and allow Render to create the resources from `render.yaml` or create services manually.
+3. Configure environment variables for the frontend service:
+    - `NEXT_PUBLIC_API_URL` — set to your backend URL (for example `https://ex-backend.onrender.com`).
+
+Notes:
+- If you use the service names in `render.yaml` (`ex-frontend`/`ex-backend`), Render will expose them at `https://ex-frontend.onrender.com` and `https://ex-backend.onrender.com` (assuming the names are available). Update `NEXT_PUBLIC_API_URL` accordingly.
+- For better security, keep cookies secure by using HTTPS in production and configuring CORS on the backend.
