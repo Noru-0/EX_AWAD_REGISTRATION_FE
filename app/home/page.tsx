@@ -37,7 +37,7 @@ export default function HomePage() {
       try {
   await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' })
       } catch (e) {
-        console.error('Logout failed', e)
+        // Logout failed, but user should still be redirected to handle client-side state
       }
       router.push('/')
     }

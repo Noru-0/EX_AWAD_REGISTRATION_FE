@@ -4,13 +4,16 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import ClientQueryProvider from '../components/query-client-provider'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+// Import debug utility to suppress console logs
+import '../lib/debug'
+
+const geist = Geist({ subsets: ["latin"] });
+const geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'Registration App',
+  description: 'User Registration and Authentication',
+  generator: 'Next.js',
   icons: {
     icon: [
       {
@@ -35,11 +38,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'development';
+  
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
+      <body className={`${geist.className} antialiased`}>
         <ClientQueryProvider>{children}</ClientQueryProvider>
-        <Analytics />
+        {!isDevelopment && <Analytics />}
       </body>
     </html>
   )

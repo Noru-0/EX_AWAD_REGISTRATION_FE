@@ -49,7 +49,6 @@ export function RegisterPage({ onSwitch }: { onSwitch?: (page: 'login' | 'regist
       router.push('/')
     } catch (err: any) {
       // handled below by reading mutation.error
-      console.error('register error', err)
     }
   }
 
