@@ -1,17 +1,17 @@
 # Render manifest for frontend service (frontend/render.yaml)
-# This file declares a single web service for the Next.js frontend.
+# This file declares a single web service for the Next.js frontend with enhanced auth features
 
 spec_version: 1
 
 services:
   - type: web
-    name: ex-frontend
+    name: ex-awad-registration-fe
     env: node
     region: oregon
     branch: master
     plan: free
     autoDeploy: true
-    buildCommand: npm install --legacy-peer-deps && npm run build
+    buildCommand: npm install --legacy-peer-deps && npm run build:prod
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -19,5 +19,7 @@ services:
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
       - key: NEXT_PUBLIC_API_URL
-        value: https://ex-awad-registration-be.onrender.com
-    # If you prefer, set NEXT_PUBLIC_API_URL in the Render dashboard instead of committing it here.
+        value: https://ex-awad-registration-be.onrender.com/api
+    # Optional: Analytics and monitoring
+    # - key: NEXT_PUBLIC_VERCEL_ANALYTICS_ID
+    # - key: NEXT_PUBLIC_SENTRY_DSN

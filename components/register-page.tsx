@@ -22,14 +22,14 @@ export function RegisterPage({ onSwitch }: { onSwitch?: (page: 'login' | 'regist
   const { toast } = useToast()
 
   const router = useRouter()
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
 
   type FormValues = { email: string; password: string; confirm: string }
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormValues>({ mode: 'onTouched' })
 
   const mutation = useMutation({
     mutationFn: async (payload: { email: string; password: string }) => {
-  const res = await fetch(`${API_BASE}/user/register`, {
+  const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

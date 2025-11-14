@@ -1,5 +1,5 @@
 import { RegisterPage } from '@/components/register-page'
 
-export default function RegisterRoute() {
+export default function Register() {
   return <RegisterPage />
 }
