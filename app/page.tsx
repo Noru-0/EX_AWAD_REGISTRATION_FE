@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export default function Home() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const router = useRouter()
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+  const API_BASE = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`
 
   useEffect(() => {
     let isCancelled = false;

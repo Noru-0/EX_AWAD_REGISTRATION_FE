@@ -23,7 +23,8 @@ export function RegisterPage({ onSwitch }: { onSwitch?: (page: 'login' | 'regist
   const { toast } = useToast()
 
   const router = useRouter()
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+  const API_BASE = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -206,7 +207,7 @@ export function RegisterPage({ onSwitch }: { onSwitch?: (page: 'login' | 'regist
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 lg:space-y-6">
               {/* Email/Phone Input */}
               <div>
-                <label className="block text-white text-sm font-medium mb-2 lg:mb-3">Email / Phone number</label>
+                <label className="block text-white text-sm font-medium mb-2 lg:mb-3">Email</label>
                 <input
                   type="text"
                   placeholder="Email"

@@ -5,14 +5,15 @@
   "scripts": {
     "build": "next build",
     "dev": "node config/setup.js development && next dev",
-    "dev:local": "node config/setup.js local && next dev",
+    "dev:local": "node config/setup.js local && next dev", 
     "dev:prod": "node config/setup.js production && next dev",
     "build:prod": "node config/setup.js production && next build",
     "start": "next start",
     "lint": "eslint .",
     "config:list": "node -e \"console.log('Available configs:', require('./config/config-manager').listAvailableConfigs())\"",
     "config:setup": "node config/setup.js",
-    "config:validate": "node -e \"require('./config/config-manager').validateConfig()\""
+    "config:validate": "node -e \"require('./config/config-manager').validateConfig()\"",
+    "postinstall": "npm run config:setup"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -45,7 +46,6 @@
     "@radix-ui/react-tooltip": "1.1.6",
     "@tanstack/react-query": "^5.90.7",
     "@vercel/analytics": "1.3.1",
-    "autoprefixer": "^10.4.20",
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -64,18 +64,17 @@
     "recharts": "2.15.4",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22.19.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.20", 
     "postcss": "^8.5",
-    "tailwindcss": "^4.1.9",
-    "tw-animate-css": "1.3.3",
+    "tailwindcss": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5"
   }
 }
