@@ -1,55 +1,59 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { useMutation } from "@tanstack/react-query"
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, LogIn, ChevronLeft, ChevronRight } from "lucide-react"
+import { useLogin } from "@/hooks/use-auth"
+import { authStorage } from "@/lib/auth-storage"
 
 const carouselImages = [
   "/mountain-sunset-vista.png",
-  "/tropical-beach-palms.png",
+  "/tropical-beach-palms.png", 
   "/forest-waterfall-nature.jpg",
   "/desert-sand-dunes-sunset.jpg",
   "/snowy-mountain-peaks.png",
 ]
 
-export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register') => void }) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
-  type FormValues = { email: string; password: string }
+type FormValues = { 
+  email: string; 
+  password: string 
+}
+
+export function NewLoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register') => void }) {
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>()
   const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const router = useRouter()
-  const mutation = useMutation({
-    mutationFn: async (vals: FormValues) => {
-      const res = await fetch(`${API_BASE}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(vals),
-      })
+  const loginMutation = useLogin()
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        const msg = err && (err.error || (err.errors && err.errors.join(', '))) ? (err.error || err.errors.join(', ')) : `Request failed: ${res.status}`
-        throw new Error(msg)
-      }
 
-      return res.json();
-    },
-    onSuccess: (data) => {
-      if (data && data.success) {
-        router.push('/home');
+  // Check if user is already authenticated
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const accessToken = authStorage.getAccessToken();
+        
+        if (accessToken) {
+          // User is already logged in, redirect to home
+          router.push('/home')
+          return
+        }
+      } catch (error) {
+        // Not authenticated, continue to login page
+      } finally {
+        setIsCheckingAuth(false)
       }
-    },
-  })
-  
-  const handleLogin = async (e?: React.FormEvent) => {
-    // placeholder; actual submit handled by react-query mutation via onSubmit below
+    }
+
+    checkAuth()
+  }, [router])
+
+  const onSubmit = (data: FormValues) => {
+    loginMutation.mutate(data);
   }
 
   const nextImage = () => {
@@ -58,6 +62,33 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
 
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length)
+  }
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{
+          backgroundImage: "url('/beautiful-nature-landscape-forest-mountains-clouds.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center", 
+          backgroundAttachment: "fixed",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="relative">
+          <div className="bg-blue-900/50 backdrop-blur-md border border-white/30 rounded-3xl p-6 lg:p-8 shadow-2xl">
+            <h2 className="text-white text-2xl lg:text-3xl font-bold mb-2">Checking authentication...</h2>
+            <p className="text-white/80 mb-6 text-sm lg:text-base">Please wait while we verify your login status.</p>
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span className="text-white/80 text-sm lg:text-base">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -72,7 +103,7 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
     >
       <div className="absolute inset-0 bg-black/30"></div>
 
-      <div className="relative w-full max-w-7xl grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-8 items-center px-4 lg:px-0">
+      <div className="relative w-full max-w-6xl lg:max-w-7xl grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-8 items-center px-4 lg:px-0">
         {/* Left Card - Image Carousel (Larger) */}
         <div className="hidden lg:block lg:col-span-3">
           <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl p-6 lg:p-8 shadow-2xl overflow-hidden">
@@ -99,12 +130,12 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
               </button>
 
               {/* Carousel Indicators */}
-              <div className="absolute bottom-2 lg:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 lg:gap-2">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 {carouselImages.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full transition ${
+                    className={`w-2 h-2 rounded-full transition ${
                       index === currentImageIndex ? "bg-white" : "bg-white/50"
                     }`}
                   />
@@ -114,32 +145,40 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
 
             {/* Title Section */}
             <div className="text-center">
-              <h2 className="text-white text-2xl lg:text-3xl font-bold mb-2">Explore the World</h2>
-              <p className="text-white/80 text-xs lg:text-sm">Travel to beautiful destinations with ease</p>
+              <h2 className="text-white text-2xl lg:text-3xl font-bold mb-2">Welcome Back</h2>
+              <p className="text-white/80 text-xs lg:text-sm">Sign in to continue your journey</p>
             </div>
           </div>
         </div>
 
         {/* Right Card - Login Form (Smaller) */}
-        <div className="w-full lg:col-span-2">
+        <div className="w-full lg:col-span-2 p-4 lg:p-0">
           <div className="bg-blue-900/50 backdrop-blur-md border border-white/30 rounded-3xl p-6 lg:p-8 shadow-2xl">
             {/* Header */}
-            <h2 className="text-white text-2xl lg:text-3xl font-bold mb-2 text-balance">Log in to start your journey.</h2>
+            <h2 className="text-white text-2xl lg:text-3xl font-bold mb-2 text-balance">Welcome back to your account.</h2>
 
             {/* Form Title */}
             <h3 className="text-white/80 text-xs font-semibold mb-6 lg:mb-8 uppercase tracking-wider">UX UI Components</h3>
 
-            <form onSubmit={handleSubmit((vals) => mutation.mutate(vals))} className="space-y-4 lg:space-y-6">
-              {/* Email/Phone Input */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 lg:space-y-6">
+              {/* Email Input */}
               <div>
-                <label className="block text-white text-sm font-medium mb-2 lg:mb-3">Email / Phone number</label>
+                <label className="block text-white text-sm font-medium mb-2 lg:mb-3">Email Address</label>
                 <input
-                  type="text"
-                  placeholder="Email"
-                  {...register('email', { required: 'Please enter your email' })}
-                  className="w-full bg-white/90 text-gray-900 placeholder-gray-400 rounded-lg px-3 lg:px-4 py-2.5 lg:py-3 text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address"
+                    }
+                  })}
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full bg-white/90 text-gray-900 placeholder-gray-400 rounded-lg px-4 py-2.5 lg:py-3 text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition"
                 />
-                {errors.email ? <p className="text-red-300 text-xs lg:text-sm mt-1">{errors.email.message}</p> : null}
+                {errors.email && (
+                  <p className="text-red-300 text-xs lg:text-sm mt-1">{errors.email.message}</p>
+                )}
               </div>
 
               {/* Password Input */}
@@ -147,86 +186,78 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
                 <label className="block text-white text-sm font-medium mb-2 lg:mb-3">Password</label>
                 <div className="relative">
                   <input
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters"
+                      }
+                    })}
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    {...register('password', { required: 'Please enter your password' })}
-                    
-                    className="w-full bg-white/90 text-gray-900 placeholder-gray-400 rounded-lg px-3 lg:px-4 py-2.5 lg:py-3 text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition pr-10 lg:pr-12"
+                    placeholder="Enter your password"
+                    className="w-full bg-white/90 text-gray-900 placeholder-gray-400 rounded-lg px-4 py-2.5 lg:py-3 text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition pr-12"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 lg:right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 transition"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 transition"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4 lg:w-5 lg:h-5" /> : <Eye className="w-4 h-4 lg:w-5 lg:h-5" />}
                   </button>
-                  {errors.password ? <p className="text-red-300 text-xs lg:text-sm mt-1">{errors.password.message}</p> : null}
                 </div>
+                {errors.password && (
+                  <p className="text-red-300 text-xs lg:text-sm mt-1">{errors.password.message}</p>
+                )}
               </div>
 
-              {/* login-only: no confirm password here */}
+              {/* Error Display */}
+              {loginMutation.error && (
+                <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3">
+                  <p className="text-red-300 text-xs lg:text-sm">
+                    {loginMutation.error instanceof Error ? loginMutation.error.message : 'Login failed'}
+                  </p>
+                </div>
+              )}
 
-              {/* Remember Login & Forgot Password */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 gap-3 sm:gap-0">
-                <label className="flex items-center gap-2 lg:gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 lg:w-5 lg:h-5 rounded cursor-pointer accent-orange-400"
-                  />
-                  <span className="text-white/80 text-xs lg:text-sm">Remember login</span>
-                </label>
-                <button
-                  type="button"
-                  className="text-white/80 hover:text-white text-xs lg:text-sm transition flex items-center gap-2"
-                >
-                  Forgot password
-                </button>
-              </div>
-
-              {/* Auth Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
-                disabled={mutation.status === 'pending'}
-                className="w-full bg-gradient-to-r from-blue-500 to-orange-400 hover:from-blue-600 hover:to-orange-500 text-white font-bold py-2.5 lg:py-3 rounded-lg transition transform hover:scale-105 flex items-center justify-center gap-2 mt-6 lg:mt-8 disabled:opacity-60 text-sm lg:text-base"
+                disabled={loginMutation.isPending}
+                className="w-full bg-gradient-to-r from-blue-500 to-orange-400 hover:from-blue-600 hover:to-orange-500 disabled:from-blue-500/50 disabled:to-orange-400/50 text-white font-bold py-2.5 lg:py-3 text-sm lg:text-base rounded-lg transition transform hover:scale-105 disabled:hover:scale-100 flex items-center justify-center gap-2 mt-6 lg:mt-8"
               >
-                <LogIn className="w-4 h-4 lg:w-5 lg:h-5" />
-                {mutation.status === 'pending' ? 'Logging in...' : 'Login'}
+                {loginMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 lg:w-5 lg:h-5 border-b-2 border-white"></div>
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4 lg:w-5 lg:h-5" />
+                    <span>Sign In</span>
+                  </>
+                )}
               </button>
 
-              {mutation.status === 'error' ? (
-                <div className="text-center text-red-300 mt-3 text-xs lg:text-sm">{(mutation.error as any)?.message || 'Login failed'}</div>
-              ) : null}
-
-              {/* Social Login */}
-              <button
-                type="button"
-                className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/30 font-semibold py-2.5 lg:py-3 rounded-lg transition flex items-center justify-center gap-2 text-xs lg:text-sm"
-              >
-                <svg className="w-4 h-4 lg:w-5 lg:h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                <span className="hidden sm:inline">Login with Google / Facebook</span>
-                <span className="sm:hidden">Login with Google</span>
-              </button>
-
-              {/* Sign Up Link */}
+              {/* Link to register */}
               <p className="text-center text-white/80 text-xs lg:text-sm">
-                <>Don't have an account yet?{' '}
-                  {onSwitch ? (
-                    <button type="button" onClick={() => onSwitch('register')} className="text-white font-semibold hover:underline">
-                      Create now!
-                    </button>
-                  ) : (
-                    <Link href="/register" className="text-white font-semibold hover:underline">
-                      Create now!
-                    </Link>
-                  )}
-                </>
+                Don&apos;t have an account?{" "}
+                {onSwitch ? (
+                  <button
+                    type="button"
+                    onClick={() => onSwitch('register')}
+                    className="text-white font-semibold hover:underline"
+                  >
+                    Sign up
+                  </button>
+                ) : (
+                  <button
+                    type="button" 
+                    onClick={() => router.push('/register')}
+                    className="text-white font-semibold hover:underline"
+                  >
+                    Sign up
+                  </button>
+                )}
               </p>
             </form>
           </div>
@@ -234,4 +265,9 @@ export function LoginPage({ onSwitch }: { onSwitch?: (page: 'login' | 'register'
       </div>
     </div>
   )
+}
+
+// Export as default for backward compatibility
+export function LoginPage(props: any) {
+  return <NewLoginPage {...props} />
 }
